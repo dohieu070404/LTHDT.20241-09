@@ -5,7 +5,7 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.util.ArrayList;
 
-public class CircuitCalculatorGUI extends JFrame {
+public class CircuitCalculator extends JFrame {
     private JComboBox<String> sourceTypeComboBox, circuitTypeComboBox, elementComboBox;
     private JTextField voltageField, frequencyField, elementValueField;
     private JTable resultTable;
@@ -15,7 +15,7 @@ public class CircuitCalculatorGUI extends JFrame {
     private int elementCount = 0;
     private DiagramRenderer diagramPanel;
 
-    public CircuitCalculatorGUI() {
+    public CircuitCalculator() {
         setTitle("Circuit Calculator");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(600, 400);
@@ -56,14 +56,14 @@ public class CircuitCalculatorGUI extends JFrame {
         inputPanel.add(circuitTypeComboBox);
         inputPanel.add(new JLabel("Loại phần tử:"));
         inputPanel.add(elementComboBox);
-        inputPanel.add(new JLabel("Giá trị phần tử:"));
+        inputPanel.add(new JLabel("Giá trị phần tử (Đơn vị \u03A9, H hoặc F):"));
         inputPanel.add(elementValueField);
         inputPanel.add(addElementButton);
         inputPanel.add(calculateButton);
         inputPanel.add(new JLabel());
         inputPanel.add(clearButton);
 
-        add(inputPanel, BorderLayout.CENTER);
+        add(inputPanel, BorderLayout.NORTH);
 
         // Event handling
         sourceTypeComboBox.addActionListener(e -> {
@@ -120,7 +120,7 @@ public class CircuitCalculatorGUI extends JFrame {
         elements.add(new CircuitElement(name, type, value));
         JOptionPane.showMessageDialog(this, "Đã thêm phần tử: " + name);
         elementCount++;
-        diagramPanel.setElements(elements, circuitTypeComboBox.getSelectedItem().toString(), sourceTypeComboBox.getSelectedItem().toString());
+        diagramPanel.setElements(elements, circuitTypeComboBox.getSelectedItem().toString());
     }
     // Phương thức tính toán mạch
     private void calculateCircuit() {
@@ -143,7 +143,7 @@ public class CircuitCalculatorGUI extends JFrame {
             JOptionPane.showMessageDialog(this, "Điện áp hoặc tần số không hợp lệ.");
             return;
         }
-
+        diagramPanel.source(sourceTypeComboBox.getSelectedItem().toString(), voltage, frequency);
         tableModel.setRowCount(0); // Clear previous results
         if (sourceType.equals("DC")) {
             calculateDCCircuit(voltage, circuitType);
@@ -152,7 +152,7 @@ public class CircuitCalculatorGUI extends JFrame {
         }
     }
     
-    // Đối với mạch điện 1 
+    // Đối với mạch điện 1 chiều
     private void calculateDCCircuit(double voltage, String circuitType) {
         double totalResistance = 0;
         boolean hasCapacitor = false;
@@ -253,7 +253,7 @@ public class CircuitCalculatorGUI extends JFrame {
 
             tableModel.addRow(new Object[]{e.name, voltageDrop, current, e.value});
         }
-        diagramPanel.setElements(elements, circuitTypeComboBox.getSelectedItem().toString(), sourceTypeComboBox.getSelectedItem().toString());
+        diagramPanel.setElements(elements, circuitTypeComboBox.getSelectedItem().toString());
     }
     // Xóa các phần tử
     private void clearElements() {
@@ -266,7 +266,7 @@ public class CircuitCalculatorGUI extends JFrame {
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
-            CircuitCalculatorGUI gui = new CircuitCalculatorGUI();
+            CircuitCalculator gui = new CircuitCalculator();
             gui.setVisible(true);
         });
     }

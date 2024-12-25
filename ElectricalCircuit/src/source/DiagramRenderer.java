@@ -4,21 +4,25 @@ import java.awt.*;
 import java.util.ArrayList;
 class DiagramRenderer extends JPanel {
     private ArrayList<CircuitElement> elements = new ArrayList<>();
-    private String circuitType = "Nối tiếp";
-    private String sourceType = "DC";
-    private boolean showDiagram = false;
+    private String circuitType;
+    private String sourceType;
+    private double voltage, frequency;
 
-    public void setElements(ArrayList<CircuitElement> elements, String circuitType, String soureType) {
+    
+    public void source(String sourceType, double voltage, double frequency) {
+    	this.sourceType = sourceType;
+    	this.voltage = voltage;
+    	this.frequency = frequency;
+    }
+    
+    public void setElements(ArrayList<CircuitElement> elements, String circuitType) {
         this.elements = elements;
         this.circuitType = circuitType;
-        this.sourceType = soureType;
-        showDiagram = true;
         repaint();
     }
     
     public void resetDiagram() {
         elements.clear();
-        showDiagram = false;
         repaint();
     }
 
@@ -71,7 +75,7 @@ class DiagramRenderer extends JPanel {
         	g2.drawLine(x - 5, y + 42, x + 5, y + 42); 
         	g2.drawLine(x, y + 53, x, y + 63);
         	g2.drawLine(x, y + 70, x, y + 100);
-
+        	g2.drawString(String.valueOf(voltage) + " V", x + 25, y + 50);
         }
         if (sourceType.equals("AC")) {
         	g2.drawLine(x, y, x, y + 30);
@@ -79,7 +83,8 @@ class DiagramRenderer extends JPanel {
         	g2.drawArc(x - 5, y + 40, 10, 10, 90, 180);
         	g2.drawArc(x - 5, y + 50, 10, 10, 90, -180);
         	g2.drawLine(x, y + 70, x, y + 100);
-//        	g2.drawString(String.valueOf(voltage), x + 15, y + 30);
+        	g2.drawString(String.valueOf(voltage) + " V", x + 25, y + 45);
+        	g2.drawString(String.valueOf(frequency) + " Hz", x + 25, y + 60);
         }
     }
     // Phương thức vẽ mạch song song
@@ -123,6 +128,7 @@ class DiagramRenderer extends JPanel {
 		    g2.drawLine((x / 2) + 12, y - 5, (x / 2) + 12, y + 5);
 		    g2.drawLine((x / 2) + 23, y, (x / 2 ) + 33, y);
 		    g2.drawLine((x / 2) + 40, y, x, y);
+		    g2.drawString(String.valueOf(voltage) + " V", x / 2, y + 40);
     	}
     	if(sourceType.equals("AC")) {
             g2.drawLine(50, y, (x / 2), y);
@@ -130,6 +136,7 @@ class DiagramRenderer extends JPanel {
 		    g2.drawArc((x / 2) + 10, y - 5, 10, 10, 0, 180);
             g2.drawArc((x / 2) + 20, y - 5, 10, 10, 0, -180);
 		    g2.drawLine((x / 2) + 40, y, x, y);
+		    g2.drawString(String.valueOf(voltage) + " V" + String.valueOf(frequency) + " Hz", x / 2, y + 40);
     	}
     }
     

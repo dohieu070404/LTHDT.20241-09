@@ -5,7 +5,6 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.util.ArrayList;
 
-
 public class CircuitCalculatorGUI extends JFrame {
     private JComboBox<String> sourceTypeComboBox, circuitTypeComboBox, elementComboBox;
     private JTextField voltageField, frequencyField, elementValueField;
@@ -15,11 +14,11 @@ public class CircuitCalculatorGUI extends JFrame {
     private ArrayList<CircuitElement> elements = new ArrayList<>();
     private int elementCount = 0;
     private DiagramRenderer diagramPanel;
-    
+
     public CircuitCalculatorGUI() {
         setTitle("Circuit Calculator");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(1200, 800);
+        setSize(600, 400);
         setLayout(new BorderLayout());
 
         // Panel for user inputs
@@ -41,13 +40,11 @@ public class CircuitCalculatorGUI extends JFrame {
         String[] columnNames = {"Phần tử", "U (Điện áp)", "I (Dòng điện)", "R (Điện trở)"};
         tableModel = new DefaultTableModel(columnNames, 0);
         resultTable = new JTable(tableModel);
-        JScrollPane tableScrollPane = new JScrollPane(resultTable);
-        
-     // Diagram Renderer Panel
+
+        // Diagram Renderer Panel
         diagramPanel = new DiagramRenderer();
-        diagramPanel.setPreferredSize(new Dimension(800, 600));
-        JScrollPane diagramScrollPane = new JScrollPane(diagramPanel);
-        
+        diagramPanel.setPreferredSize(new Dimension(400, 400));
+
         // Add components to input panel
         inputPanel.add(new JLabel("Loại nguồn điện:"));
         inputPanel.add(sourceTypeComboBox);
@@ -66,10 +63,8 @@ public class CircuitCalculatorGUI extends JFrame {
         inputPanel.add(new JLabel());
         inputPanel.add(clearButton);
 
-        add(inputPanel, BorderLayout.NORTH);
-        add(tableScrollPane, BorderLayout.CENTER);
-        add(diagramScrollPane, BorderLayout.EAST);
-        
+        add(inputPanel, BorderLayout.CENTER);
+
         // Event handling
         sourceTypeComboBox.addActionListener(e -> {
             boolean isAC = sourceTypeComboBox.getSelectedItem().equals("AC");
@@ -77,8 +72,33 @@ public class CircuitCalculatorGUI extends JFrame {
         });
 
         addElementButton.addActionListener(e -> addElement());
-        calculateButton.addActionListener(e -> calculateCircuit());
+        calculateButton.addActionListener(e -> showCalculationWindow());
         clearButton.addActionListener(e -> clearElements());
+    }
+
+    // Tạo cửa sổ hiển thị kết quả tính toán
+    private void showCalculationWindow() {
+        if (elements.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Hãy thêm ít nhất một phần tử.");
+            return;
+        }
+
+        JFrame calculationWindow = new JFrame("Kết quả tính toán");
+        calculationWindow.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        calculationWindow.setSize(800, 800);
+        calculationWindow.setLayout(new BorderLayout());
+
+        // ScrollPane cho bảng và sơ đồ
+        JScrollPane tableScrollPane = new JScrollPane(resultTable);
+        JScrollPane diagramScrollPane = new JScrollPane(diagramPanel);
+
+        calculationWindow.add(tableScrollPane, BorderLayout.CENTER);
+        calculationWindow.add(diagramScrollPane, BorderLayout.SOUTH);
+
+        calculationWindow.setVisible(true);
+
+        // Tiến hành tính toán mạch
+        calculateCircuit();
     }
     // Phương thức thêm phần tử mạch
     private void addElement() {
@@ -100,7 +120,7 @@ public class CircuitCalculatorGUI extends JFrame {
         elements.add(new CircuitElement(name, type, value));
         JOptionPane.showMessageDialog(this, "Đã thêm phần tử: " + name);
         elementCount++;
-        diagramPanel.setElements(elements, circuitTypeComboBox.getSelectedItem().toString());
+        diagramPanel.setElements(elements, circuitTypeComboBox.getSelectedItem().toString(), sourceTypeComboBox.getSelectedItem().toString());
     }
     // Phương thức tính toán mạch
     private void calculateCircuit() {
@@ -113,7 +133,7 @@ public class CircuitCalculatorGUI extends JFrame {
         String circuitType = circuitTypeComboBox.getSelectedItem().toString();
         double voltage;
         double frequency = 0;
-
+        
         try {
             voltage = Double.parseDouble(voltageField.getText());
             if (sourceType.equals("AC")) {
@@ -197,7 +217,7 @@ public class CircuitCalculatorGUI extends JFrame {
         }
     }
 
-    // Đối với mạch điện 2 
+    // Đối với mạch điện 2 chiều
     private void calculateACCircuit(double voltage, double frequency, String circuitType) {
         double omega = 2 * Math.PI * frequency;
         double totalResistance = 0, totalReactance = 0;
@@ -233,9 +253,9 @@ public class CircuitCalculatorGUI extends JFrame {
 
             tableModel.addRow(new Object[]{e.name, voltageDrop, current, e.value});
         }
-        diagramPanel.setElements(elements, circuitTypeComboBox.getSelectedItem().toString());
+        diagramPanel.setElements(elements, circuitTypeComboBox.getSelectedItem().toString(), sourceTypeComboBox.getSelectedItem().toString());
     }
-    // Xóa các phần 
+    // Xóa các phần tử
     private void clearElements() {
         elements.clear();
         elementCount = 0;

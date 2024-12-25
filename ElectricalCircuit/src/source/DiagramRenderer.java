@@ -136,7 +136,7 @@ class DiagramRenderer extends JPanel {
 		    g2.drawArc((x / 2) + 10, y - 5, 10, 10, 0, 180);
             g2.drawArc((x / 2) + 20, y - 5, 10, 10, 0, -180);
 		    g2.drawLine((x / 2) + 40, y, x, y);
-		    g2.drawString(String.valueOf(voltage) + " V" + String.valueOf(frequency) + " Hz", x / 2, y + 40);
+		    g2.drawString(String.valueOf(voltage) + " V" + String.valueOf(frequency) + " Hz", x / 2 - 15, y + 40);
     	}
     }
     

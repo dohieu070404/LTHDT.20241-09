@@ -1,8 +1,8 @@
 package source;
-import java.awt.*;
+
 class CircuitElement {
     String name;
-    String type; // R, L, hoặc C
+    String type;
     double value;
     double voltage;
     double current;

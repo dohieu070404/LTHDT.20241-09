@@ -74,8 +74,10 @@ public class CircuitCalculator extends JFrame {
         addElementButton.addActionListener(e -> addElement());
         calculateButton.addActionListener(e -> showCalculationWindow());
         clearButton.addActionListener(e -> clearElements());
+        
+        diagramPanel.setElements(elements, circuitTypeComboBox.getSelectedItem().toString());
     }
-
+    
     // Tạo cửa sổ hiển thị kết quả tính toán
     private void showCalculationWindow() {
         if (elements.isEmpty()) {
@@ -182,7 +184,7 @@ public class CircuitCalculator extends JFrame {
                     if (e.type.equals("C")) {
                         // Tính U và I cho tụ điện trong mạch song song DC
                         double current = 0;
-                        tableModel.addRow(new Object[]{e.name, voltage, current, e.value});
+                        tableModel.addRow(new Object[]{e.name, voltage, current, 0.0});
                     } else if (e.type.equals("R")) {
                         double current = voltage / e.value;
                         tableModel.addRow(new Object[]{e.name, voltage, current, e.value});
@@ -194,8 +196,12 @@ public class CircuitCalculator extends JFrame {
         if (circuitType.equals("Nối tiếp")) {
             if(hasCapacitor) {
                 for (CircuitElement e : elements) {
-                    tableModel.addRow(new Object[]{e.name, voltage, 0.0, e.value});
-                    }
+                	if (e.type.equals("R")) {
+                		tableModel.addRow(new Object[]{e.name, voltage, 0.0, e.value});
+                	} else {
+                		tableModel.addRow(new Object[]{e.name, voltage, 0.0, 0.0});
+                	}	
+                }
                 return;
             } else if (totalResistance == 0) {
                 JOptionPane.showMessageDialog(this, "Ngắn mạch!", "Lỗi", JOptionPane.ERROR_MESSAGE);
@@ -209,8 +215,7 @@ public class CircuitCalculator extends JFrame {
 	                    voltageDrop = current * e.value; // Điện áp rơi trên điện trở
 	                    tableModel.addRow(new Object[]{e.name, voltageDrop, current, e.value});
 	                } else if (e.type.equals("L")) {
-	                    // Cuộn cảm trong mạch DC nối tiếp: U và I bằng 0
-	                    tableModel.addRow(new Object[]{e.name, 0.0, current, e.value});
+	                    tableModel.addRow(new Object[]{e.name, 0.0, current, 0.0});
 	                }
 	            }
             }
@@ -247,11 +252,18 @@ public class CircuitCalculator extends JFrame {
 
         for (CircuitElement e : elements) {
             double voltageDrop = 0;
-            if (e.type.equals("R")) voltageDrop = current * e.value;
-            else if (e.type.equals("L")) voltageDrop = current * omega * e.value;
-            else if (e.type.equals("C")) voltageDrop = current * (1 / (omega * e.value));
-
-            tableModel.addRow(new Object[]{e.name, voltageDrop, current, e.value});
+            if (e.type.equals("R")) {
+            	voltageDrop = current * e.value;
+            	tableModel.addRow(new Object[]{e.name, voltageDrop, current, e.value});
+            }
+            else if (e.type.equals("L")) { 
+            	voltageDrop = current * omega * e.value;
+            	tableModel.addRow(new Object[]{e.name, voltageDrop, current, 2 * Math.PI * frequency * e.value});
+            }
+            else if (e.type.equals("C")) { 
+            	voltageDrop = current * (1 / (omega * e.value));
+            	tableModel.addRow(new Object[]{e.name, voltageDrop, current, 1 / (2 * Math.PI * frequency * e.value)});
+            }
         }
         diagramPanel.setElements(elements, circuitTypeComboBox.getSelectedItem().toString());
     }

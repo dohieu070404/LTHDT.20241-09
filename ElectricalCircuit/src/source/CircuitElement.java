@@ -6,12 +6,10 @@ class CircuitElement {
     double value;
     double voltage;
     double current;
-    Rectangle bounds; // Vị trí phần tử trên sơ đồ
 
-    CircuitElement(String name, String type, double value) {
+    public CircuitElement(String name, String type, double value) {
         this.name = name;
         this.type = type;
         this.value = value;
-        this.bounds = new Rectangle();
     }
 }

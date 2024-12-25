@@ -5,17 +5,17 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.util.ArrayList;
 
-public class CircuitCalculatorGUI extends JFrame {
+public class CircuitCalculator extends JFrame {
     private JComboBox<String> sourceTypeComboBox, circuitTypeComboBox, elementComboBox;
     private JTextField voltageField, frequencyField, elementValueField;
     private JTable resultTable;
     private DefaultTableModel tableModel;
-    private JButton addElementButton, calculateButton, clearButton;
+    private JButton addElementButton, calculateButton, clearButton, addInductor, addResistor, addCapacitor;
     private ArrayList<CircuitElement> elements = new ArrayList<>();
     private int elementCount = 0;
     private DiagramRenderer diagramPanel;
 
-    public CircuitCalculatorGUI() {
+    public CircuitCalculator() {
         setTitle("Circuit Calculator");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(600, 400);
@@ -25,14 +25,18 @@ public class CircuitCalculatorGUI extends JFrame {
         JPanel inputPanel = new JPanel(new GridLayout(9, 2));
         sourceTypeComboBox = new JComboBox<>(new String[]{"Chọn loại nguồn", "DC", "AC"});
         circuitTypeComboBox = new JComboBox<>(new String[]{"Chọn loại mạch", "Nối tiếp", "Song song"});
-        elementComboBox = new JComboBox<>(new String[]{"R", "L", "C"});
+//        elementComboBox = new JComboBox<>(new String[]{"R", "L", "C"});
 
         voltageField = new JTextField();
         frequencyField = new JTextField();
         frequencyField.setEnabled(false);
         elementValueField = new JTextField();
 
-        addElementButton = new JButton("Thêm phần tử");
+//        addElementButton = new JButton("Thêm phần tử");
+        addInductor = new JButton("Thêm cuộn cảm");
+        addResistor = new JButton("Thêm điện trở");
+        addCapacitor = new JButton("Thêm tụ điện");
+        
         calculateButton = new JButton("Tính toán");
         clearButton = new JButton("Xóa tất cả");
 
@@ -54,16 +58,20 @@ public class CircuitCalculatorGUI extends JFrame {
         inputPanel.add(frequencyField);
         inputPanel.add(new JLabel("Loại mạch:"));
         inputPanel.add(circuitTypeComboBox);
-        inputPanel.add(new JLabel("Loại phần tử:"));
-        inputPanel.add(elementComboBox);
-        inputPanel.add(new JLabel("Giá trị phần tử:"));
-        inputPanel.add(elementValueField);
-        inputPanel.add(addElementButton);
+//        inputPanel.add(new JLabel("Loại phần tử:"));
+//        inputPanel.add(elementComboBox);
+//        inputPanel.add(new JLabel("Giá trị phần tử (Đơn vị \u03A9, H hoặc F):"));
+//        inputPanel.add(elementValueField);
+        
+        inputPanel.add(addInductor);
+        inputPanel.add(addResistor);
+        inputPanel.add(addCapacitor);
+        
         inputPanel.add(calculateButton);
         inputPanel.add(new JLabel());
         inputPanel.add(clearButton);
 
-        add(inputPanel, BorderLayout.CENTER);
+        add(inputPanel, BorderLayout.NORTH);
 
         // Event handling
         sourceTypeComboBox.addActionListener(e -> {
@@ -71,7 +79,10 @@ public class CircuitCalculatorGUI extends JFrame {
             frequencyField.setEnabled(isAC);
         });
 
-        addElementButton.addActionListener(e -> addElement());
+        addResistor.addActionListener(e -> addElement("R"));
+        addInductor.addActionListener(e -> addElement("L"));
+        addCapacitor.addActionListener(e -> addElement("C"));
+        
         calculateButton.addActionListener(e -> showCalculationWindow());
         clearButton.addActionListener(e -> clearElements());
     }
@@ -101,13 +112,13 @@ public class CircuitCalculatorGUI extends JFrame {
         calculateCircuit();
     }
     // Phương thức thêm phần tử mạch
-    private void addElement() {
+    private void addElement(String type) {
         if (elementCount >= 5) {
             JOptionPane.showMessageDialog(this, "Chỉ được thêm tối đa 5 phần tử.");
             return;
         }
 
-        String type = elementComboBox.getSelectedItem().toString();
+//        String type = elementComboBox.getSelectedItem().toString();
         String name = type + (elementCount + 1);
         double value;
         try {
@@ -119,8 +130,10 @@ public class CircuitCalculatorGUI extends JFrame {
 
         elements.add(new CircuitElement(name, type, value));
         JOptionPane.showMessageDialog(this, "Đã thêm phần tử: " + name);
+        String message = String.format("Đã thêm phần tử: %s (Loại: %s, Giá trị: %.2f)", name, type, value);
+        JOptionPane.showMessageDialog(null, message, "Thông tin phần tử", JOptionPane.INFORMATION_MESSAGE);
         elementCount++;
-        diagramPanel.setElements(elements, circuitTypeComboBox.getSelectedItem().toString(), sourceTypeComboBox.getSelectedItem().toString());
+        diagramPanel.setElements(elements, circuitTypeComboBox.getSelectedItem().toString());
     }
     // Phương thức tính toán mạch
     private void calculateCircuit() {
@@ -143,7 +156,7 @@ public class CircuitCalculatorGUI extends JFrame {
             JOptionPane.showMessageDialog(this, "Điện áp hoặc tần số không hợp lệ.");
             return;
         }
-
+        diagramPanel.source(sourceTypeComboBox.getSelectedItem().toString(), voltage, frequency);
         tableModel.setRowCount(0); // Clear previous results
         if (sourceType.equals("DC")) {
             calculateDCCircuit(voltage, circuitType);
@@ -152,7 +165,7 @@ public class CircuitCalculatorGUI extends JFrame {
         }
     }
     
-    // Đối với mạch điện 1 
+    // Đối với mạch điện 1 chiều
     private void calculateDCCircuit(double voltage, String circuitType) {
         double totalResistance = 0;
         boolean hasCapacitor = false;
@@ -253,7 +266,6 @@ public class CircuitCalculatorGUI extends JFrame {
 
             tableModel.addRow(new Object[]{e.name, voltageDrop, current, e.value});
         }
-        diagramPanel.setElements(elements, circuitTypeComboBox.getSelectedItem().toString(), sourceTypeComboBox.getSelectedItem().toString());
     }
     // Xóa các phần tử
     private void clearElements() {
@@ -266,7 +278,7 @@ public class CircuitCalculatorGUI extends JFrame {
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
-            CircuitCalculatorGUI gui = new CircuitCalculatorGUI();
+            CircuitCalculator gui = new CircuitCalculator();
             gui.setVisible(true);
         });
     }

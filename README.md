@@ -15,3 +15,5 @@ Mai Trung Hiếu - 20225838
 Link demo sản phẩm https://youtu.be/pMVcZWsX3bE
 
 slide thuyết trình https://www.canva.com/design/DAGY_G4X7k0/ohFWYHDbey8YCYNqcjS4cg/edit?utm_content=DAGY_G4X7k0&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton
+
+Report   https://docs.google.com/document/d/1zHQb7KgwIIdIOQg8yBN6KFLRCa7URWZb/edit?usp=sharing&ouid=112674547422327577668&rtpof=true&sd=true
